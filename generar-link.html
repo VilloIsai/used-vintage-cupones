@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Used Vintage — Generador de links</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      background: #fdf6ee;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      border: 1px solid #e0d4c8;
+      padding: 2rem;
+      width: 100%;
+      max-width: 480px;
+    }
+    h1 { font-size: 20px; font-weight: 500; color: #1a1a1a; margin-bottom: 0.3rem; }
+    .sub { font-size: 13px; color: #999; margin-bottom: 1.5rem; }
+    label { font-size: 13px; color: #555; display: block; margin-bottom: 6px; }
+    input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 15px;
+      margin-bottom: 1.2rem;
+      font-family: inherit;
+      background: #fafafa;
+    }
+    input:focus { outline: none; border-color: #c9773a; background: #fff; }
+    button {
+      width: 100%;
+      background: #c9773a;
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      padding: 14px;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    button:hover { opacity: 0.88; }
+
+    .resultado {
+      display: none;
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background: #f5f0eb;
+      border-radius: 10px;
+    }
+    .resultado p { font-size: 12px; color: #777; margin-bottom: 6px; }
+    .link-text {
+      font-size: 13px;
+      word-break: break-all;
+      color: #1a1a1a;
+      font-family: monospace;
+      margin-bottom: 10px;
+    }
+    .btn-copiar {
+      width: auto;
+      background: #1a1a1a;
+      padding: 8px 20px;
+      font-size: 13px;
+      border-radius: 6px;
+    }
+    .copiado { color: #4caf50; font-size: 12px; margin-top: 6px; display: none; }
+  </style>
+</head>
+<body>
+<div class="card">
+  <h1>Generador de links de regalo</h1>
+  <p class="sub">Ingresá el nombre de la clienta y generá su link único.</p>
+
+  <label for="nombre">Nombre o apodo de la clienta</label>
+  <input type="text" id="nombre" placeholder="ej: Sofi, Ana, Caro..." />
+
+  <button onclick="generarLink()">Generar link</button>
+
+  <div class="resultado" id="resultado">
+    <p>Link generado — mandáselo por WhatsApp o Instagram:</p>
+    <div class="link-text" id="linkTexto"></div>
+    <button class="btn-copiar" onclick="copiar()">Copiar link</button>
+    <p class="copiado" id="copiado">¡Copiado!</p>
+  </div>
+</div>
+
+<script>
+  // Cambiá esto por tu dominio real de Netlify
+  const DOMINIO = "https://TU-SITIO.netlify.app";
+
+  function generarLink() {
+    const nombre = document.getElementById('nombre').value.trim();
+    if (!nombre) { alert('Ingresá un nombre'); return; }
+
+    const hoy = new Date();
+    const fecha = hoy.getFullYear().toString() +
+      String(hoy.getMonth() + 1).padStart(2, '0') +
+      String(hoy.getDate()).padStart(2, '0');
+
+    // Código único: nombre + fecha + 4 letras random
+    const random = Math.random().toString(36).slice(2, 6);
+    const nombreSlug = nombre.toLowerCase().replace(/\s+/g, '').replace(/[^a-z0-9]/g, '');
+    const codigo = `${nombreSlug}_${fecha}_${random}`;
+
+    const link = `${DOMINIO}/?c=${codigo}`;
+    document.getElementById('linkTexto').textContent = link;
+    document.getElementById('resultado').style.display = 'block';
+    document.getElementById('copiado').style.display = 'none';
+  }
+
+  function copiar() {
+    const texto = document.getElementById('linkTexto').textContent;
+    navigator.clipboard.writeText(texto).then(() => {
+      document.getElementById('copiado').style.display = 'block';
+    });
+  }
+</script>
+</body>
+</html>
