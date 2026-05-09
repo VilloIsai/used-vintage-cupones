@@ -4,351 +4,577 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Used Vintage — Tu regalo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    :root {
+      --bg: #1a0a2e;
+      --bg2: #2d1250;
+      --gold: #f0c060;
+      --gold2: #e8a030;
+      --pink: #e8608a;
+      --cream: #fdf0e0;
+      --white: #ffffff;
+    }
+
     body {
-      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-      background: #fdf6ee;
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 2rem 1rem;
-    }
-
-    .marca {
-      font-size: 11px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: #999;
-      margin-bottom: 0.5rem;
-      text-align: center;
-    }
-
-    h1 {
-      font-size: 24px;
-      font-weight: 400;
-      color: #1a1a1a;
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-
-    /* Ventana animación */
-    .ventana-wrap {
-      width: 320px;
-      height: 180px;
-      border-radius: 16px;
-      border: 1.5px solid #e0d4c8;
-      background: #fff;
       overflow: hidden;
       position: relative;
-      margin-bottom: 2rem;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
     }
-    .cupones-track {
+
+    /* ── Fondo con partículas decorativas ── */
+    .bg-orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.25;
+      pointer-events: none;
+      animation: drift 8s ease-in-out infinite alternate;
+    }
+    .bg-orb-1 { width: 400px; height: 400px; background: var(--pink); top: -100px; left: -100px; animation-delay: 0s; }
+    .bg-orb-2 { width: 350px; height: 350px; background: var(--gold); bottom: -80px; right: -80px; animation-delay: -3s; }
+    .bg-orb-3 { width: 250px; height: 250px; background: #6040c0; top: 40%; left: 30%; animation-delay: -5s; }
+
+    @keyframes drift {
+      from { transform: translate(0, 0) scale(1); }
+      to   { transform: translate(30px, 20px) scale(1.08); }
+    }
+
+    /* Estrellitas de fondo */
+    .stars {
+      position: fixed; inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .star {
+      position: absolute;
+      width: 3px; height: 3px;
+      background: rgba(255,255,255,0.6);
+      border-radius: 50%;
+      animation: twinkle var(--d, 3s) ease-in-out infinite alternate;
+      animation-delay: var(--delay, 0s);
+    }
+
+    @keyframes twinkle {
+      from { opacity: 0.1; transform: scale(0.8); }
+      to   { opacity: 0.9; transform: scale(1.2); }
+    }
+
+    /* ── Contenedor principal ── */
+    .contenedor {
+      position: relative;
+      z-index: 10;
       display: flex;
       flex-direction: column;
+      align-items: center;
+      padding: 2rem 1.5rem;
+      width: 100%;
+      max-width: 480px;
+    }
+
+    /* ── Header ── */
+    .marca {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.2rem;
+      opacity: 0.85;
+    }
+
+    .titulo-regalo {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(26px, 7vw, 38px);
+      font-weight: 700;
+      color: var(--cream);
+      text-align: center;
+      line-height: 1.2;
+      margin-bottom: 0.4rem;
+    }
+
+    .subtitulo {
+      font-size: 13px;
+      color: rgba(253,240,224,0.5);
+      text-align: center;
+      margin-bottom: 2rem;
+      font-weight: 300;
+      letter-spacing: 0.04em;
+    }
+
+    /* ── Marco de la ventana ── */
+    .ventana-marco {
+      width: 100%;
+      max-width: 360px;
+      position: relative;
+      margin-bottom: 2.2rem;
+    }
+
+    /* Bordes decorativos dorados */
+    .ventana-marco::before, .ventana-marco::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 20px);
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      z-index: 2;
+    }
+    .ventana-marco::before { top: -1px; }
+    .ventana-marco::after  { bottom: -1px; }
+
+    .ventana-wrap {
+      width: 100%;
+      height: 170px;
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(240,192,96,0.3);
+      box-shadow: 0 0 40px rgba(240,192,96,0.1), inset 0 0 20px rgba(0,0,0,0.3);
+    }
+
+    /* Track horizontal */
+    .cupones-track {
+      display: flex;
+      flex-direction: row;
+      height: 100%;
       will-change: transform;
     }
+
     .cupon-slide {
-      width: 320px;
-      height: 180px;
       flex-shrink: 0;
+      width: 360px;
+      height: 170px;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 10px;
+      padding: 14px;
     }
+
     .cupon-slide img {
       max-width: 100%;
       max-height: 100%;
       object-fit: contain;
       border-radius: 8px;
+      filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
     }
-    .linea-sup, .linea-inf {
-      position: absolute;
-      left: 0; right: 0;
-      height: 2px;
-      background: #c9773a;
-      pointer-events: none;
-    }
-    .linea-sup { top: 0; }
-    .linea-inf { bottom: 0; }
 
-    /* Botón */
+    /* Bordes laterales de fade */
+    .ventana-fade-l, .ventana-fade-r {
+      position: absolute;
+      top: 0; bottom: 0;
+      width: 50px;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .ventana-fade-l { left: 0; background: linear-gradient(90deg, rgba(26,10,46,0.7), transparent); }
+    .ventana-fade-r { right: 0; background: linear-gradient(-90deg, rgba(26,10,46,0.7), transparent); }
+
+    /* Líneas laterales indicadoras */
+    .linea-izq, .linea-der {
+      position: absolute;
+      top: 0; bottom: 0;
+      width: 2px;
+      background: linear-gradient(180deg, transparent, var(--gold), transparent);
+      z-index: 3;
+    }
+    .linea-izq { left: 0; }
+    .linea-der { right: 0; }
+
+    /* ── Botón principal ── */
     .btn-tocar {
-      background: #c9773a;
-      color: #fff;
+      position: relative;
+      background: linear-gradient(135deg, var(--gold2), var(--gold), var(--gold2));
+      background-size: 200% 200%;
+      color: #1a0a2e;
       border: none;
       border-radius: 50px;
-      padding: 16px 48px;
+      padding: 18px 52px;
       font-size: 16px;
       font-weight: 500;
+      font-family: 'DM Sans', sans-serif;
+      letter-spacing: 0.04em;
       cursor: pointer;
-      transition: opacity 0.2s, transform 0.1s;
-      font-family: inherit;
+      overflow: hidden;
+      transition: transform 0.15s, box-shadow 0.3s;
+      animation: shimmer 3s ease infinite;
+      box-shadow: 0 4px 30px rgba(240,192,96,0.4), 0 0 0 0 rgba(240,192,96,0);
     }
-    .btn-tocar:hover { opacity: 0.88; }
-    .btn-tocar:active { transform: scale(0.97); }
-    .btn-tocar:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
 
-    /* Pantalla ganadora */
+    .btn-tocar::before {
+      content: '';
+      position: absolute;
+      top: -50%; left: -60%;
+      width: 40%; height: 200%;
+      background: rgba(255,255,255,0.35);
+      transform: skewX(-20deg);
+      animation: shine 3s ease-in-out infinite;
+    }
+
+    @keyframes shine {
+      0%   { left: -60%; }
+      30%  { left: 140%; }
+      100% { left: 140%; }
+    }
+
+    @keyframes shimmer {
+      0%   { background-position: 0% 50%; box-shadow: 0 4px 30px rgba(240,192,96,0.4), 0 0 0 0 rgba(240,192,96,0.3); }
+      50%  { background-position: 100% 50%; box-shadow: 0 4px 40px rgba(240,192,96,0.6), 0 0 20px 4px rgba(240,192,96,0.15); }
+      100% { background-position: 0% 50%; box-shadow: 0 4px 30px rgba(240,192,96,0.4), 0 0 0 0 rgba(240,192,96,0.3); }
+    }
+
+    .btn-tocar:hover { transform: translateY(-2px) scale(1.03); }
+    .btn-tocar:active { transform: scale(0.97); }
+    .btn-tocar:disabled {
+      opacity: 0.4; cursor: not-allowed;
+      animation: none;
+      transform: none;
+      box-shadow: none;
+    }
+    .btn-tocar:disabled::before { display: none; }
+
+    /* ── Confetti al ganar ── */
+    .confetti-piece {
+      position: fixed;
+      width: 8px; height: 8px;
+      top: -10px;
+      border-radius: 2px;
+      pointer-events: none;
+      z-index: 100;
+      animation: caer var(--dur) ease-in forwards;
+      animation-delay: var(--delay);
+    }
+    @keyframes caer {
+      0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+      80%  { opacity: 1; }
+      100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+    }
+
+    /* ── Pantalla ganadora ── */
     #p-ganadora {
       display: none;
       flex-direction: column;
       align-items: center;
       gap: 1.2rem;
       text-align: center;
+      animation: aparecer 0.5s ease;
     }
-    .ganadora-titulo { font-size: 22px; font-weight: 500; color: #1a1a1a; }
+
+    @keyframes aparecer {
+      from { opacity: 0; transform: scale(0.92) translateY(10px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .ganadora-badge {
+      background: linear-gradient(135deg, var(--gold2), var(--gold));
+      color: #1a0a2e;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 6px 20px;
+      border-radius: 50px;
+    }
+
+    .ganadora-titulo {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(24px, 6vw, 32px);
+      font-weight: 700;
+      color: var(--cream);
+      line-height: 1.2;
+    }
+
     .cupon-ganado-wrap {
-      width: 320px;
+      width: 100%;
+      max-width: 360px;
       border-radius: 16px;
       overflow: hidden;
-      border: 1.5px solid #e0d4c8;
-      box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+      border: 1px solid rgba(240,192,96,0.4);
+      box-shadow: 0 8px 40px rgba(0,0,0,0.5), 0 0 30px rgba(240,192,96,0.15);
+      animation: glow 2.5s ease-in-out infinite alternate;
     }
-    .cupon-ganado-wrap img { width: 100%; display: block; }
-    .instruccion { font-size: 13px; color: #999; max-width: 280px; line-height: 1.6; }
 
-    /* Pantalla expirado */
-    #p-expirado {
+    @keyframes glow {
+      from { box-shadow: 0 8px 40px rgba(0,0,0,0.5), 0 0 20px rgba(240,192,96,0.1); }
+      to   { box-shadow: 0 8px 40px rgba(0,0,0,0.5), 0 0 40px rgba(240,192,96,0.3); }
+    }
+
+    .cupon-ganado-wrap img { width: 100%; display: block; }
+
+    .instruccion {
+      font-size: 13px;
+      color: rgba(253,240,224,0.45);
+      max-width: 280px;
+      line-height: 1.7;
+    }
+
+    /* ── Pantallas extra ── */
+    #p-expirado, #p-error {
       display: none;
       flex-direction: column;
       align-items: center;
       gap: 1rem;
       text-align: center;
     }
-    .exp-icono { font-size: 40px; }
-    .exp-titulo { font-size: 20px; font-weight: 500; color: #1a1a1a; }
-    .exp-sub { font-size: 14px; color: #999; max-width: 260px; line-height: 1.6; }
+    .extra-icono { font-size: 44px; margin-bottom: 0.3rem; }
+    .extra-titulo { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--cream); font-weight: 700; }
+    .extra-sub { font-size: 14px; color: rgba(253,240,224,0.45); max-width: 260px; line-height: 1.6; }
 
-    /* Pantalla error */
-    #p-error {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.5rem;
-      text-align: center;
+    #p-cargando { text-align: center; }
+    #p-cargando .marca { display: block; margin-bottom: 1rem; }
+    #p-cargando p { color: rgba(253,240,224,0.3); font-size: 13px; }
+
+    /* ── Responsivo ── */
+    @media (max-width: 400px) {
+      .ventana-wrap { height: 150px; }
+      .cupon-slide { width: 100vw; height: 150px; }
+      .btn-tocar { padding: 16px 40px; font-size: 15px; }
     }
-    #p-error p { font-size: 14px; color: #aaa; }
-
-    /* Cargando */
-    #p-cargando { text-align: center; color: #bbb; font-size: 14px; }
   </style>
 </head>
 <body>
 
-  <div id="p-cargando">
-    <p class="marca">Used Vintage</p>
-    <br><p>Cargando...</p>
+  <!-- Fondo -->
+  <div class="bg-orb bg-orb-1"></div>
+  <div class="bg-orb bg-orb-2"></div>
+  <div class="bg-orb bg-orb-3"></div>
+  <div class="stars" id="stars"></div>
+
+  <!-- CARGANDO -->
+  <div id="p-cargando" style="position:relative;z-index:10;text-align:center;">
+    <span class="marca">Used Vintage</span>
+    <p>Preparando tu regalo...</p>
   </div>
 
-  <div id="p-principal" style="display:none; flex-direction:column; align-items:center;">
-    <p class="marca">Used Vintage</p>
-    <h1>te regala un...</h1>
-    <div class="ventana-wrap">
-      <div class="cupones-track" id="track"></div>
-      <div class="linea-sup"></div>
-      <div class="linea-inf"></div>
+  <!-- PANTALLA PRINCIPAL -->
+  <div id="p-principal" style="display:none;">
+    <div class="contenedor">
+      <p class="marca">Used Vintage</p>
+      <h1 class="titulo-regalo">Te regala<br><em>un regalo especial</em></h1>
+      <p class="subtitulo">Tocá el botón para descubrir qué ganaste</p>
+
+      <div class="ventana-marco">
+        <div class="ventana-wrap">
+          <div class="cupones-track" id="track"></div>
+          <div class="ventana-fade-l"></div>
+          <div class="ventana-fade-r"></div>
+          <div class="linea-izq"></div>
+          <div class="linea-der"></div>
+        </div>
+      </div>
+
+      <button class="btn-tocar" id="btnTocar">✨ Tocá para recibir tu regalo</button>
     </div>
-    <button class="btn-tocar" id="btnTocar">Tocá para recibir tu regalo</button>
   </div>
 
+  <!-- PANTALLA GANADORA -->
   <div id="p-ganadora">
-    <p class="marca">Used Vintage</p>
-    <p class="ganadora-titulo">¡Este es tu cupón!</p>
-    <div class="cupon-ganado-wrap">
-      <img id="img-ganadora" src="" alt="Tu cupón" />
+    <div class="contenedor">
+      <p class="marca">Used Vintage</p>
+      <div class="ganadora-badge">¡Tu cupón!</div>
+      <h2 class="ganadora-titulo">¡Felicitaciones!</h2>
+      <div class="cupon-ganado-wrap">
+        <img id="img-ganadora" src="" alt="Tu cupón" />
+      </div>
+      <p class="instruccion">Guardá esta imagen o mostrá este link al hacer tu compra.</p>
     </div>
-    <p class="instruccion">Guardá esta imagen o mostrá este link al hacer tu compra.</p>
   </div>
 
+  <!-- PANTALLA EXPIRADO -->
   <div id="p-expirado">
-    <p class="exp-icono">⏳</p>
-    <p class="exp-titulo">Este link expiró</p>
-    <p class="exp-sub">Los links de regalo duran 3 días. Pedile a Used Vintage un nuevo link.</p>
+    <div class="contenedor">
+      <p class="marca">Used Vintage</p>
+      <p class="extra-icono">⏳</p>
+      <p class="extra-titulo">Este link expiró</p>
+      <p class="extra-sub">Los links de regalo duran 3 días. Pedile a Used Vintage un nuevo link.</p>
+    </div>
   </div>
 
+  <!-- PANTALLA ERROR -->
   <div id="p-error">
-    <p class="marca">Used Vintage</p>
-    <br><p>Link inválido o expirado.</p>
+    <div class="contenedor">
+      <p class="marca">Used Vintage</p>
+      <p class="extra-icono">🎀</p>
+      <p class="extra-titulo">Link inválido</p>
+      <p class="extra-sub">Revisá que el link esté completo o pedile uno nuevo a Used Vintage.</p>
+    </div>
   </div>
 
-<script>
-// ============================================================
-//  CUPONES — agregá o cambiá acá
-//  probabilidad: número más alto = sale más seguido
-// ============================================================
-const CUPONES = [
-  {
-    id: "cupon10",
-    imagen: "Cupon10.png",
-    label: "10% de descuento",
-    probabilidad: 70,
-  },
-  {
-    id: "cupon15",
-    imagen: "Cupon15.png",
-    label: "15% de descuento",
-    probabilidad: 30,
-  },
-  // Para agregar más cupones, copiá este bloque y pegalo acá arriba:
-  // {
-  //   id: "cuponNuevo",           ← nombre interno único, sin espacios
-  //   imagen: "NombreArchivo.png", ← nombre exacto del archivo
-  //   label: "Descripción corta",
-  //   probabilidad: 20,
-  // },
-];
+  <!-- Configuración de cupones (se carga antes que el script principal) -->
+  <script src="src/cupones.js"></script>
 
-const DIAS_EXPIRACION = 3;
+  <script>
+    // ── Supabase ──
+    const SUPABASE_URL = "https://akfxqtzbkrrroaejdxbg.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFrZnhxdHpia3Jycm9hZWpkeGJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyNjQxODMsImV4cCI6MjA5Mzg0MDE4M30.qWVrTuqjK2Q9ah7uad1Mgiz4zWSS-iuZ9xob53zsNb4";
 
-// ============================================================
-//  SUPABASE — ya configurado con tu proyecto
-// ============================================================
-const SUPABASE_URL = "https://akfxqtzbkrrroaejdxbg.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFrZnhxdHpia3Jycm9hZWpkeGJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyNjQxODMsImV4cCI6MjA5Mzg0MDE4M30.qWVrTuqjK2Q9ah7uad1Mgiz4zWSS-iuZ9xob53zsNb4"; // ← reemplazá esto con la clave "anon public" que empieza con eyJ...
+    // ── Tomar config de cupones.js ──
+    const CUPONES = window.UV_CONFIG.cupones;
+    const DIAS_EXPIRACION = window.UV_CONFIG.diasExpiracion;
 
-// ============================================================
-//  LÓGICA — no toques nada de acá abajo
-// ============================================================
-const ITEM_H = 180;
-const PANTALLAS = ['p-cargando','p-principal','p-ganadora','p-expirado','p-error'];
+    const ITEM_W = document.querySelector('.ventana-wrap')?.offsetWidth || 360;
+    const PANTALLAS = ['p-cargando','p-principal','p-ganadora','p-expirado','p-error'];
 
-function mostrar(id) {
-  PANTALLAS.forEach(p => {
-    const el = document.getElementById(p);
-    if (!el) return;
-    if (p === id) {
-      el.style.display = (p === 'p-principal' || p === 'p-ganadora' || p === 'p-expirado' || p === 'p-error') ? 'flex' : 'block';
-    } else {
-      el.style.display = 'none';
+    // ── Estrellas de fondo ──
+    const starsEl = document.getElementById('stars');
+    for (let i = 0; i < 60; i++) {
+      const s = document.createElement('div');
+      s.className = 'star';
+      s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${2+Math.random()*4}s;--delay:${Math.random()*4}s`;
+      starsEl.appendChild(s);
     }
-  });
-}
 
-async function dbGet(codigo) {
-  try {
-    const r = await fetch(
-      `${SUPABASE_URL}/rest/v1/regalos?codigo=eq.${encodeURIComponent(codigo)}&select=*`,
-      { headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` } }
-    );
-    if (!r.ok) return 'error';
-    const d = await r.json();
-    return d.length > 0 ? d[0] : null;
-  } catch(e) { return 'error'; }
-}
-
-async function dbGuardar(codigo, cuponId) {
-  try {
-    const r = await fetch(`${SUPABASE_URL}/rest/v1/regalos`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "apikey": SUPABASE_KEY,
-        "Authorization": `Bearer ${SUPABASE_KEY}`,
-        "Prefer": "return=minimal"
-      },
-      body: JSON.stringify({ codigo, cupon_id: cuponId, creado_en: new Date().toISOString() })
-    });
-    return r.ok;
-  } catch(e) { return false; }
-}
-
-function elegirCupon() {
-  const total = CUPONES.reduce((s, c) => s + c.probabilidad, 0);
-  let r = Math.random() * total;
-  for (const c of CUPONES) { r -= c.probabilidad; if (r <= 0) return c; }
-  return CUPONES[0];
-}
-
-function diasDesde(fechaStr) {
-  return (Date.now() - new Date(fechaStr).getTime()) / (1000 * 60 * 60 * 24);
-}
-
-function armarTrack() {
-  const track = document.getElementById('track');
-  const lista = [];
-  for (let i = 0; i < 8; i++) lista.push(...CUPONES);
-  lista.forEach(c => {
-    const div = document.createElement('div');
-    div.className = 'cupon-slide';
-    div.innerHTML = `<img src="${c.imagen}" alt="${c.label}" />`;
-    track.appendChild(div);
-  });
-  return lista;
-}
-
-function animar(lista, ganador, onFin) {
-  const track = document.getElementById('track');
-  const idxBase = Math.floor(lista.length * 0.7);
-  const idxGanador = idxBase - (idxBase % CUPONES.length) + CUPONES.findIndex(c => c.id === ganador.id);
-  const distancia = idxGanador * ITEM_H;
-  const duracion = 3400;
-  const inicio = performance.now();
-  const ease = t => 1 - Math.pow(1 - t, 4);
-  function frame(now) {
-    const t = Math.min((now - inicio) / duracion, 1);
-    track.style.transform = `translateY(-${ease(t) * distancia}px)`;
-    if (t < 1) requestAnimationFrame(frame);
-    else setTimeout(onFin, 500);
-  }
-  requestAnimationFrame(frame);
-}
-
-function mostrarGanadora(cuponId) {
-  const cupon = CUPONES.find(c => c.id === cuponId) || CUPONES[0];
-  document.getElementById('img-ganadora').src = cupon.imagen;
-  mostrar('p-ganadora');
-}
-
-async function iniciar() {
-  const params = new URLSearchParams(window.location.search);
-  const codigo = params.get('c');
-
-  if (!codigo) { mostrar('p-error'); return; }
-
-  // Verificar expiración por fecha en el código (formato: nombre_YYYYMMDD_xxxx)
-  const partes = codigo.split('_');
-  if (partes.length >= 3) {
-    const f = partes[partes.length - 2];
-    if (f && f.length === 8 && /^\d{8}$/.test(f)) {
-      const fecha = new Date(
-        parseInt(f.slice(0,4)),
-        parseInt(f.slice(4,6)) - 1,
-        parseInt(f.slice(6,8))
-      );
-      if (diasDesde(fecha) > DIAS_EXPIRACION) { mostrar('p-expirado'); return; }
+    function mostrar(id) {
+      PANTALLAS.forEach(p => {
+        const el = document.getElementById(p);
+        if (!el) return;
+        el.style.display = p === id ? 'flex' : 'none';
+      });
     }
-  }
 
-  const registro = await dbGet(codigo);
-  if (registro === 'error') { mostrar('p-error'); return; }
+    async function dbGet(codigo) {
+      try {
+        const r = await fetch(
+          `${SUPABASE_URL}/rest/v1/regalos?codigo=eq.${encodeURIComponent(codigo)}&select=*`,
+          { headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` } }
+        );
+        if (!r.ok) return 'error';
+        const d = await r.json();
+        return d.length > 0 ? d[0] : null;
+      } catch { return 'error'; }
+    }
 
-  if (registro) {
-    if (diasDesde(registro.creado_en) > DIAS_EXPIRACION) { mostrar('p-expirado'); return; }
-    mostrarGanadora(registro.cupon_id);
-    return;
-  }
+    async function dbGuardar(codigo, cuponId) {
+      try {
+        await fetch(`${SUPABASE_URL}/rest/v1/regalos`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": SUPABASE_KEY,
+            "Authorization": `Bearer ${SUPABASE_KEY}`,
+            "Prefer": "return=minimal"
+          },
+          body: JSON.stringify({ codigo, cupon_id: cuponId, creado_en: new Date().toISOString() })
+        });
+      } catch { console.error("Error guardando"); }
+    }
 
-  // Primera vez
-  mostrar('p-principal');
-  const lista = armarTrack();
+    function elegirCupon() {
+      const total = CUPONES.reduce((s, c) => s + c.probabilidad, 0);
+      let r = Math.random() * total;
+      for (const c of CUPONES) { r -= c.probabilidad; if (r <= 0) return c; }
+      return CUPONES[0];
+    }
 
-  document.getElementById('btnTocar').addEventListener('click', () => {
-    document.getElementById('btnTocar').disabled = true;
-    const ganador = elegirCupon();
-    animar(lista, ganador, async () => {
-      await dbGuardar(codigo, ganador.id);
-      mostrarGanadora(ganador.id);
-    });
-  });
-}
+    function diasDesde(fechaStr) {
+      return (Date.now() - new Date(fechaStr).getTime()) / (1000 * 60 * 60 * 24);
+    }
 
-iniciar();
-</script>
+    function armarTrack() {
+      const track = document.getElementById('track');
+      const ventanaW = document.querySelector('.ventana-wrap').offsetWidth;
+      const lista = [];
+      for (let i = 0; i < 8; i++) lista.push(...CUPONES);
+      lista.forEach(c => {
+        const div = document.createElement('div');
+        div.className = 'cupon-slide';
+        div.style.width = ventanaW + 'px';
+        div.innerHTML = `<img src="${c.imagen}" alt="${c.label}" />`;
+        track.appendChild(div);
+      });
+      return { lista, ventanaW };
+    }
+
+    function animar(lista, ventanaW, ganador, onFin) {
+      const track = document.getElementById('track');
+      const idxBase = Math.floor(lista.length * 0.65);
+      const idxGanador = idxBase - (idxBase % CUPONES.length) + CUPONES.findIndex(c => c.id === ganador.id);
+      const distancia = idxGanador * ventanaW;
+      const duracion = 3600;
+      const inicio = performance.now();
+      const ease = t => 1 - Math.pow(1 - t, 4);
+      function frame(now) {
+        const t = Math.min((now - inicio) / duracion, 1);
+        track.style.transform = `translateX(-${ease(t) * distancia}px)`;
+        if (t < 1) requestAnimationFrame(frame);
+        else setTimeout(onFin, 500);
+      }
+      requestAnimationFrame(frame);
+    }
+
+    function lanzarConfetti() {
+      const colores = ['#f0c060','#e8608a','#a060e0','#60c0f0','#fff'];
+      for (let i = 0; i < 60; i++) {
+        const p = document.createElement('div');
+        p.className = 'confetti-piece';
+        p.style.cssText = `
+          left: ${Math.random()*100}vw;
+          background: ${colores[Math.floor(Math.random()*colores.length)]};
+          --dur: ${1.5 + Math.random()*2}s;
+          --delay: ${Math.random()*0.8}s;
+          border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+        `;
+        document.body.appendChild(p);
+        setTimeout(() => p.remove(), 4000);
+      }
+    }
+
+    function mostrarGanadora(cuponId) {
+      const cupon = CUPONES.find(c => c.id === cuponId) || CUPONES[0];
+      document.getElementById('img-ganadora').src = cupon.imagen;
+      mostrar('p-ganadora');
+      lanzarConfetti();
+    }
+
+    async function iniciar() {
+      const params = new URLSearchParams(window.location.search);
+      const codigo = params.get('c');
+      if (!codigo) { mostrar('p-error'); return; }
+
+      // Verificar expiración por fecha en el código
+      const partes = codigo.split('_');
+      if (partes.length >= 3) {
+        const f = partes[partes.length - 2];
+        if (f && f.length === 8 && /^\d{8}$/.test(f)) {
+          const fecha = new Date(parseInt(f.slice(0,4)), parseInt(f.slice(4,6))-1, parseInt(f.slice(6,8)));
+          if (diasDesde(fecha) > DIAS_EXPIRACION) { mostrar('p-expirado'); return; }
+        }
+      }
+
+      const registro = await dbGet(codigo);
+      if (registro === 'error') { mostrar('p-error'); return; }
+
+      if (registro) {
+        if (diasDesde(registro.creado_en) > DIAS_EXPIRACION) { mostrar('p-expirado'); return; }
+        mostrarGanadora(registro.cupon_id);
+        return;
+      }
+
+      mostrar('p-principal');
+      const { lista, ventanaW } = armarTrack();
+
+      document.getElementById('btnTocar').addEventListener('click', () => {
+        document.getElementById('btnTocar').disabled = true;
+        const ganador = elegirCupon();
+        animar(lista, ventanaW, ganador, async () => {
+          await dbGuardar(codigo, ganador.id);
+          mostrarGanadora(ganador.id);
+        });
+      });
+    }
+
+    iniciar();
+  </script>
 </body>
 </html>
