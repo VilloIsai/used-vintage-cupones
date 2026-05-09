@@ -1,30 +1,38 @@
 // =====================================================
-//   CONFIGURACIÓN DE CUPONES — USED VINTAGE
-//   Solo editá este archivo para agregar/cambiar cupones
+//   USED VINTAGE — CONFIGURACIÓN DE CUPONES
+//   Este es el único archivo que necesitás editar
+//   para agregar cupones o cambiar probabilidades
 // =====================================================
 
-export const CUPONES = [
-  {
-    id: "cupon10",
-    imagen: "/cupones/Cupon10.png",   // nombre del archivo que subiste
-    label: "10% de descuento",         // texto corto para la animación
-    probabilidad: 70,                  // más alto = sale más seguido
-  },
-  {
-    id: "cupon15",
-    imagen: "/cupones/Cupon15.png",
-    label: "15% de descuento",
-    probabilidad: 30,                  // más raro que el 10%
-  },
+window.UV_CONFIG = {
 
-  // ¿Querés agregar un cupón nuevo? Copiá el bloque de arriba y pegalo acá:
-  // {
-  //   id: "cuponEnvio",
-  //   imagen: "/cupones/CuponEnvio.png",
-  //   label: "Envío gratis",
-  //   probabilidad: 20,
-  // },
-];
+  // Días que dura el link antes de expirar
+  diasExpiracion: 3,
 
-// Días que dura el link antes de expirar
-export const DIAS_EXPIRACION = 3;
+  // Lista de cupones
+  // probabilidad: número más alto = sale más seguido
+  // Para agregar uno nuevo: copiá un bloque y pegalo al final de la lista (antes del ] )
+  cupones: [
+    {
+      id: "cupon10",
+      imagen: "public/cupones/Cupon10.png",
+      label: "10% OFF",
+      probabilidad: 70,
+    },
+    {
+      id: "cupon15",
+      imagen: "public/cupones/Cupon15.png",
+      label: "15% OFF",
+      probabilidad: 30,
+    },
+
+    // Ejemplo de cómo agregar un cupón nuevo:
+    // {
+    //   id: "cuponEnvio",              ← nombre interno único, sin espacios
+    //   imagen: "public/cupones/CuponEnvio.png",  ← archivo en la carpeta public/cupones/
+    //   label: "Envío gratis",
+    //   probabilidad: 20,
+    // },
+  ],
+
+};
