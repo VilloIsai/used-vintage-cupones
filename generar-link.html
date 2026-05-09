@@ -7,7 +7,7 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
       background: #fdf6ee;
       min-height: 100vh;
       display: flex;
@@ -21,23 +21,26 @@
       border: 1px solid #e0d4c8;
       padding: 2rem;
       width: 100%;
-      max-width: 480px;
+      max-width: 460px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.05);
     }
+    .marca { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #999; margin-bottom: 0.4rem; }
     h1 { font-size: 20px; font-weight: 500; color: #1a1a1a; margin-bottom: 0.3rem; }
-    .sub { font-size: 13px; color: #999; margin-bottom: 1.5rem; }
-    label { font-size: 13px; color: #555; display: block; margin-bottom: 6px; }
+    .sub { font-size: 13px; color: #aaa; margin-bottom: 1.8rem; }
+    label { font-size: 13px; color: #555; display: block; margin-bottom: 6px; font-weight: 500; }
     input {
       width: 100%;
-      padding: 10px 14px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
+      padding: 12px 14px;
+      border: 1.5px solid #e0d4c8;
+      border-radius: 10px;
       font-size: 15px;
       margin-bottom: 1.2rem;
       font-family: inherit;
       background: #fafafa;
+      transition: border-color 0.2s;
     }
     input:focus { outline: none; border-color: #c9773a; background: #fff; }
-    button {
+    .btn-generar {
       width: 100%;
       background: #c9773a;
       color: #fff;
@@ -48,55 +51,74 @@
       font-weight: 500;
       cursor: pointer;
       font-family: inherit;
+      transition: opacity 0.2s;
     }
-    button:hover { opacity: 0.88; }
-
+    .btn-generar:hover { opacity: 0.88; }
     .resultado {
       display: none;
       margin-top: 1.5rem;
-      padding: 1rem;
+      padding: 1rem 1.2rem;
       background: #f5f0eb;
-      border-radius: 10px;
+      border-radius: 12px;
     }
-    .resultado p { font-size: 12px; color: #777; margin-bottom: 6px; }
+    .resultado-label { font-size: 12px; color: #999; margin-bottom: 8px; }
     .link-text {
       font-size: 13px;
       word-break: break-all;
       color: #1a1a1a;
       font-family: monospace;
+      background: #fff;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid #e0d4c8;
       margin-bottom: 10px;
+      line-height: 1.5;
     }
-    .btn-copiar {
-      width: auto;
-      background: #1a1a1a;
-      padding: 8px 20px;
+    .btns-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn-copiar, .btn-wsp {
+      padding: 9px 18px;
       font-size: 13px;
-      border-radius: 6px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: inherit;
+      border: none;
+      font-weight: 500;
+      transition: opacity 0.2s;
     }
-    .copiado { color: #4caf50; font-size: 12px; margin-top: 6px; display: none; }
+    .btn-copiar { background: #1a1a1a; color: #fff; }
+    .btn-wsp { background: #25D366; color: #fff; }
+    .btn-copiar:hover, .btn-wsp:hover { opacity: 0.85; }
+    .copiado { color: #4caf50; font-size: 12px; margin-top: 8px; display: none; }
   </style>
 </head>
 <body>
 <div class="card">
+  <p class="marca">Used Vintage</p>
   <h1>Generador de links de regalo</h1>
-  <p class="sub">Ingresá el nombre de la clienta y generá su link único.</p>
+  <p class="sub">Ingresá el nombre de la clienta y generá su link único de 3 días.</p>
 
-  <label for="nombre">Nombre o apodo de la clienta</label>
-  <input type="text" id="nombre" placeholder="ej: Sofi, Ana, Caro..." />
+  <label for="nombre">Nombre de la clienta</label>
+  <input type="text" id="nombre" placeholder="ej: Sofi, Ana, Caro..." autocomplete="off"
+    onkeydown="if(event.key==='Enter') generarLink()" />
 
-  <button onclick="generarLink()">Generar link</button>
+  <button class="btn-generar" onclick="generarLink()">Generar link</button>
 
   <div class="resultado" id="resultado">
-    <p>Link generado — mandáselo por WhatsApp o Instagram:</p>
+    <p class="resultado-label">Link generado — válido por 3 días:</p>
     <div class="link-text" id="linkTexto"></div>
-    <button class="btn-copiar" onclick="copiar()">Copiar link</button>
+    <div class="btns-row">
+      <button class="btn-copiar" onclick="copiar()">Copiar link</button>
+      <button class="btn-wsp" onclick="abrirWsp()">Enviar por WhatsApp</button>
+    </div>
     <p class="copiado" id="copiado">¡Copiado!</p>
   </div>
 </div>
 
 <script>
-  // Cambiá esto por tu dominio real de Netlify
+  // ← Cambiá esto cuando tengas el dominio de Netlify
   const DOMINIO = "https://usedvintage-regalo.netlify.app";
+
+  let linkActual = "";
 
   function generarLink() {
     const nombre = document.getElementById('nombre').value.trim();
@@ -107,22 +129,32 @@
       String(hoy.getMonth() + 1).padStart(2, '0') +
       String(hoy.getDate()).padStart(2, '0');
 
-    // Código único: nombre + fecha + 4 letras random
     const random = Math.random().toString(36).slice(2, 6);
-    const nombreSlug = nombre.toLowerCase().replace(/\s+/g, '').replace(/[^a-z0-9]/g, '');
-    const codigo = `${nombreSlug}_${fecha}_${random}`;
+    const slug = nombre.toLowerCase()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]/g, '');
+    const codigo = `${slug}_${fecha}_${random}`;
 
-    const link = `${DOMINIO}/?c=${codigo}`;
-    document.getElementById('linkTexto').textContent = link;
+    linkActual = `${DOMINIO}/?c=${codigo}`;
+    document.getElementById('linkTexto').textContent = linkActual;
     document.getElementById('resultado').style.display = 'block';
     document.getElementById('copiado').style.display = 'none';
+    document.getElementById('nombre').value = '';
   }
 
   function copiar() {
-    const texto = document.getElementById('linkTexto').textContent;
-    navigator.clipboard.writeText(texto).then(() => {
-      document.getElementById('copiado').style.display = 'block';
+    navigator.clipboard.writeText(linkActual).then(() => {
+      const el = document.getElementById('copiado');
+      el.style.display = 'block';
+      setTimeout(() => el.style.display = 'none', 2000);
     });
+  }
+
+  function abrirWsp() {
+    const texto = encodeURIComponent(
+      "¡Hola! 🎁 Used Vintage te tiene un regalo especial.\nTocá el link para descubrirlo: " + linkActual
+    );
+    window.open(`https://wa.me/?text=${texto}`, '_blank');
   }
 </script>
 </body>
