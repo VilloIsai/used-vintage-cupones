@@ -7,7 +7,7 @@
 window.UV_CONFIG = {
 
   // Días que dura el link antes de expirar
-  diasExpiracion: 3,
+  diasExpiracion: 30,
 
   // Lista de cupones
   // probabilidad: número más alto = sale más seguido
