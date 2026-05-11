@@ -350,19 +350,16 @@
 </head>
 <body>
 
-  <!-- Fondo -->
   <div class="bg-orb bg-orb-1"></div>
   <div class="bg-orb bg-orb-2"></div>
   <div class="bg-orb bg-orb-3"></div>
   <div class="stars" id="stars"></div>
 
-  <!-- CARGANDO -->
   <div id="p-cargando" style="position:relative;z-index:10;text-align:center;">
     <span class="marca">Used Vintage</span>
     <p>Preparando tu regalo...</p>
   </div>
 
-  <!-- PANTALLA PRINCIPAL -->
   <div id="p-principal" style="display:none;">
     <div class="contenedor">
       <p class="marca">Used Vintage</p>
@@ -383,7 +380,6 @@
     </div>
   </div>
 
-  <!-- PANTALLA GANADORA -->
   <div id="p-ganadora">
     <div class="contenedor" style="gap: 1.4rem; padding-top: 2.5rem; padding-bottom: 2.5rem;">
       <p class="marca">Used Vintage</p>
@@ -396,7 +392,6 @@
     </div>
   </div>
 
-  <!-- PANTALLA EXPIRADO -->
   <div id="p-expirado">
     <div class="contenedor">
       <p class="marca">Used Vintage</p>
@@ -406,7 +401,6 @@
     </div>
   </div>
 
-  <!-- PANTALLA ERROR -->
   <div id="p-error">
     <div class="contenedor">
       <p class="marca">Used Vintage</p>
@@ -416,7 +410,6 @@
     </div>
   </div>
 
-  <!-- Configuración de cupones (se carga antes que el script principal) -->
   <script src="src/cupones.js"></script>
 
   <script>
@@ -460,17 +453,18 @@
       } catch { return 'error'; }
     }
 
-    async function dbGuardar(codigo, cuponId) {
+    // MODIFICADO: Ahora hace PATCH para actualizar el registro existente
+    async function dbActualizar(codigo, cuponId) {
       try {
-        await fetch(`${SUPABASE_URL}/rest/v1/regalos`, {
-          method: "POST",
+        await fetch(`${SUPABASE_URL}/rest/v1/regalos?codigo=eq.${encodeURIComponent(codigo)}`, {
+          method: "PATCH",
           headers: {
             "Content-Type": "application/json",
             "apikey": SUPABASE_KEY,
             "Authorization": `Bearer ${SUPABASE_KEY}`,
             "Prefer": "return=minimal"
           },
-          body: JSON.stringify({ codigo, cupon_id: cuponId, creado_en: new Date().toISOString() })
+          body: JSON.stringify({ cupon_id: cuponId })
         });
       } catch { console.error("Error guardando"); }
     }
@@ -568,15 +562,28 @@
         }
       }
 
+      // SISTEMA ESTRICTO VIP: Ir a la base de datos a buscar el registro
       const registro = await dbGet(codigo);
-      if (registro === 'error') { mostrar('p-error'); return; }
+      
+      // 1. Si el registro NO existe, o hubo un error -> Rechazado (Hackers o cupones borrados)
+      if (registro === 'error' || !registro) { 
+        mostrar('p-error'); 
+        return; 
+      }
 
-      if (registro) {
-        if (diasDesde(registro.creado_en) > DIAS_EXPIRACION) { mostrar('p-expirado'); return; }
+      // 2. Si el código está en la base, verificamos si venció por fecha en la base
+      if (diasDesde(registro.creado_en) > DIAS_EXPIRACION) { 
+        mostrar('p-expirado'); 
+        return; 
+      }
+
+      // 3. Si el código está en la base y NO dice 'pendiente', significa que ya jugó
+      if (registro.cupon_id !== 'pendiente') {
         mostrarGanadora(registro.cupon_id);
         return;
       }
 
+      // 4. Si pasamos todos los escudos, es un link nuevo y autorizado. ¡A jugar!
       mostrar('p-principal');
       const { lista, ventanaW } = armarTrack();
 
@@ -606,7 +613,8 @@
         document.getElementById('btnTocar').disabled = true;
         const ganador = elegirCupon();
         animar(lista, ventanaW, idlePos, ganador, async () => {
-          await dbGuardar(codigo, ganador.id);
+          // MODIFICADO: Llamamos a dbActualizar en lugar de dbGuardar
+          await dbActualizar(codigo, ganador.id);
           mostrarGanadora(ganador.id);
         });
       });
